@@ -1,0 +1,115 @@
+;Aerotech D9 RASP.ENG file made from NAR published data
+;File produced July 4, 2000
+;Submitted to ThrustCurve.org by Chris Kobel (3/29/07)
+;The total impulse, peak thrust, average thrust and burn time are
+;the same as the averaged static test data on the NAR web site in
+;the certification file. The curve drawn with these data points is as
+;close to the certification curve as can be with such a limited
+;number of points (32) allowed with wRASP up to v1.6.
+D9W 24 70 4-7 0.0101001 0.045 AT 
+0.1 13.7
+0.15 15.4
+0.2 16.3
+0.25 16.8
+0.35 17.2
+0.4 17.2
+0.5 16.8
+0.65 15.9
+0.8 14.5
+1.1 9.2
+1.25 7
+1.4 4.8
+1.6 2.5
+1.9 0
+;
+;White Dwarf-0.2,2 smallest test engine - mass flow rate of 0.2kg/s
+; 0.2.2 indicates chamber size 0, mass flow 0.2, burn time 2
+;File producing 7th March 2020
+;5cm chamber diameter, 4mm wall thickness
+WD0.2,2 60.0 300.0 P 0.4 2.0 AT
+0   340
+1   340
+2     0
+;
+;White Dwarf-0.2,5 smallest test engine - mass flow rate of 0.2kg/s
+; 0.2.2 indicates chamber size 0, mass flow 0.2, burn time 5s
+;File producing 7th March 2020
+;5cm chamber diameter, 4mm wall thickness
+WD0.2,5 60.0 750.0 P 1.0 4.2 AT
+0   340
+1   340
+2   340
+3   340
+4   340
+5     0
+;
+;White Dwarf-4.49,2  - mass flow rate of 4.9kg/s
+; 4.49,2 indicates chamber size 4, mass flow 4.9, burn time 2s
+;File producing 7th March 2020
+;20cm chamber diameter, 4mm wall thickness
+WD4.49,2 240 300 P 9.9 20 CUSF
+0  8500
+1  8500
+2     0
+;
+;White Dwarf-4.49,10  - mass flow rate of 4.9kg/s
+; 4.49,10 indicates chamber size 4, mass flow 4.9, burn time 10s
+;File producing 7th March 2020
+;20cm chamber diameter, 4mm wall thickness
+WD4.49,10 240 1500 P 50 93 CUSF
+0  8500
+1  8500
+2  8500
+3  8500
+4  8500
+5  8500
+6  8500
+7  8500
+8  8500
+9  8500
+10 8500
+10.1  0
+;
+;White Dwarf-4.49,17  - mass flow rate of 4.9kg/s
+; 4.49,17 indicates chamber size 4, mass flow 4.9, burn time 17s
+;File producing 7th March 2020
+;20cm chamber diameter, 4mm wall thickness
+WD4.49,17 240 3400 P 84 139 CUSF
+0  8500
+1  8500
+2  8500
+3  8500
+4  8500
+5  8500
+6  8500
+7  8500
+8  8500
+9  8500
+10 8500
+11 8500
+12 8500
+13 8500
+14 8500
+15 8500
+16 8500
+17 8500
+17.1  0
+;
+; Pro98-6GXL 20146N5800-CS P
+N5800-CS 98 1239 P 9.425 14.826 CTI
+   0.019 6694.9
+   0.049 6720.292
+   0.103 6593.334
+   0.384 6677.973
+   1.109 6957.279
+   1.569 6940.352
+   1.991 6720.292
+   2.622 6009.329
+   3.011 3275.507
+   3.192 2606.864
+   3.334 1599.666
+   3.423 1041.053
+   3.513 389.337
+   3.581 220.06
+   3.594 0.0
+;
