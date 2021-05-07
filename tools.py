@@ -87,14 +87,56 @@ def nitrous_thermophys(temp):
     c = ((2.49973 * (1 + 0.023454 * (T0_INV ** (-1)) + -3.80136 * T0_INV
                    + 13.0945 * (T0_INV ** 2) + -14.5180 * (T0_INV ** 3))) * 1000)
 
-    vpres = (7251000 * (np.e ** (T0_RECIP * ( -6.71893 * T0_INV)
-             + 1.35966 * (T0_INV ** (3 / 2)) + -1.3779 * (T0_INV ** (5 / 2))
-             + -4.051 * T0_INV ** 5)))
+    vpres =  7251000 * (np.e **(T0_RECIP * 
+        ( -6.71893 * T0_INV) + 
+        (1.35966 * pow(T0_INV, 1.5)) + 
+        (-1.3779 * pow(T0_INV, 2.5)) + 
+        (-4.051 * pow(T0_INV, 5))))
 
     ldynvis = (0.0293423*np.e**((1.609*(((309.57-5.24)/(temp-5.24)-1)**(1/3)))
                +(2.0439*(((309.57-5.24)/(temp-5.24)-1)**(4/3)))))
 
-    return (lden, vden, hl, hg, c, vpres, ldynvis)
+
+    properties = {
+        "rho_l" : lden,
+        "rho_v" : vden,
+        "h_l" :   hl,
+        "h_v":    hg,
+        "specific_heat_capacity_isobaric":   c,
+        "vapour_pressure": vpres,
+        "dynamic_visc": ldynvis,
+        "v_l":  (1/lden),
+        "v_v":  (1/vden)
+    }
+    return(properties)
+
+def nitrous_thermophys_dt(temp):
+    if not 183.15 <= temp <= 309.57:
+        raise ValueError('nitrous oxide temperature out of data range')
+
+    # Some handy definitions
+    # ...I don't know what to call these properly
+    T0 = temp / 309.57
+    T_crit = 309.57
+    T0_RECIP = 1 / T0
+    T0_INV = 1 - T0
+    
+    nitrous_properties = nitrous_thermophys(temp)
+
+    vpres_dT = nitrous_properties["vapour_pressure"] * (((T_crit*( 
+            (6.71893 / T_crit) +
+            ((-2.03949 * pow(T0_INV, 0.5)) / T_crit) + 
+            (((3.44475 * pow(T0_INV, 1.5)) / T_crit) + 
+            (20.255 * pow(T0_INV, 4)) / T_crit))
+        / temp))  -
+        ((T_crit / pow(temp, 2)) * (
+            (-6.71893 * T0_INV) +
+            (1.35966 * pow(T0_INV, 1.5)) +
+            (-1.3779 * pow(T0_INV, 2.5)) + 
+            (-4.051 * pow(T0_INV, 5)) 
+            )))
+    
+    print(vpres_dT)
 
 def ipa_thermophys(temp):
     """Get IPA data at a given temperature
@@ -116,7 +158,7 @@ def ipa_thermophys(temp):
     lden = 925.87 + (-0.0359 * temp) + (-0.0015 * temp**2)
     # Fit for data obtained from http://www.ddbst.com/en/EED/PCP/DEN_C95.php
 
-    vden = 0
+    vden = 1e-7
 
     hl = -247.1 + (-0.6133 * temp) + (0.0055 * temp**2)
     # Fit for data obtained from https://pubs.acs.org/doi/10.1021/ie50466a033
@@ -131,7 +173,18 @@ def ipa_thermophys(temp):
     ldynvis = 22.397 * np.e ** (-0.031 * temp)
     # Fit for data obtained from http://www.ddbst.com/en/EED/PCP/VIS_C95.php
 
-    return (lden, vden, hl, hg, c, vpres, ldynvis)
+    properties = {
+        "rho_l" : lden,
+        "rho_v" : vden,
+        "h_l" :   hl,
+        "h_v":    hg,
+        "latent_heat_vap":   c,
+        "vapour_pressure": vpres,
+        "dynamic_visc": ldynvis,
+        "v_l":  (1/lden),
+        "v_v":  (1/vden)
+    }
+    return(properties)
 
 
 def helium_thermophys(temp, pressure):
@@ -148,3 +201,4 @@ def helium_thermophys(temp, pressure):
 
     return (vden, hv)
 
+nitrous_thermophys_dt(290.5)

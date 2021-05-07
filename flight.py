@@ -17,8 +17,8 @@ def make_panthera(temperature, of_ratio , ox_tank_volume = None, ox_mass = 110):
     
     aluminium = Material(2700, 270e6)
 
-    nitrous_density = nitrous_thermophys(temperature)[0]
-    ipa_density = ipa_thermophys(temperature)[0] 
+    nitrous_density = nitrous_thermophys(temperature)["rho_l"]
+    ipa_density = ipa_thermophys(temperature)["rho_l"]
 
     # Densities multiplied by 0.9 to allow for ullage space
     if ox_tank_volume == None and (type(ox_mass) == int or type(ox_mass) == float):
@@ -84,7 +84,7 @@ def integrator(x, v, a, dt):
     Leave me alone, it works. If you want RK, do it yourself
     """
     new_v = v + (a * dt)
-    new_x = x + (v * dt)
+    new_x = x + (new_v * dt)
 
     return(new_x, new_v)
 
@@ -236,3 +236,6 @@ for i in range(len(t_steps)):
 
 print(heights)
 """
+griffin = make_two_stage_rocket(250,110)
+times, position_1st_stage, velocity_1st_stage, position_2nd_stage, velocity_2nd_stage, acceleration_1st_stage, acceleration_2nd_stage = main_flight_loop(griffin, 1)
+        

@@ -44,7 +44,13 @@ class Propellant(object):
 
             if self.propellant == Propellant_Name.NITROUS:
                 self.thermophys = nitrous_thermophys
-                self.den_l, self.den_v, self.h_l, self.h_v, self.latent_heat_vapourisation, self.pressure, ldynvis = self.thermophys(self.temperature)
+
+                nitrous_properties = self.thermophys(self.temperature)
+                self.den_l = nitrous_properties["rho_l"]
+                self.den_v = nitrous_properties["rho_v"]
+                self.h_l = nitrous_properties["h_l"]
+                self.h_v = nitrous_properties["h_v"]
+                self.pressure = nitrous_properties["vapour_pressure"]
 
                 self.fluid = Fluid('nitrous oxide', method='helmholz', T = self.temperature, P = self.pressure)
 
@@ -73,7 +79,13 @@ class Propellant(object):
 
             if self.propellant == Propellant_Name.IPA:
                 self.thermophys = ipa_thermophys
-                self.den_l, den_v, self.h_l, h_v, latent_heat_vapourisation, pressure, ldynvis = self.thermophys(self.temperature)
+
+                ipa_properties = self.thermophys(self.temperature)
+                self.den_l = ipa_properties["rho_l"]
+                self.den_v = ipa_properties["rho_v"]
+                self.h_l = ipa_properties["h_l"]
+                self.h_v = ipa_properties["h_v"]
+                self.pressure = ipa_properties["vapour_pressure"]
                 self.cv_l = 2680
 
             self.mass_l = prop_mass
@@ -104,11 +116,15 @@ class Propellant(object):
             return(H*V)
         else:
             dryness, temp = arguments
-            den_l, den_v, h_l, h_v, c, pres, ldynvis = self.thermophys(temp)
+            properties = self.thermophys(self.temperature)
+            v_l = properties["v_l"]
+            v_v = properties["v_v"]
+            h_l = properties["h_l"]
+            h_v = properties["h_v"]
 
             #enthalpy_diff and volume_diff are the difference between predicted and true values, squared to produce a smooth odd function
             enthalpy_diff = ((self.mass * dryness * h_v ) + (self.mass * (1 - dryness) * h_l) - self.enthalpy)**2
-            volume_diff = ((dryness * self.mass / den_v) + ((1-dryness) * self.mass / den_l) - self.volume)**2
+            volume_diff = ((dryness * self.mass * v_v) + ((1-dryness) * self.mass * v_l) - self.volume)**2
 
             return((enthalpy_diff*volume_diff)**2)
     
@@ -147,7 +163,13 @@ class Propellant(object):
             self.dryness = new_dryness
             self.temperature = new_temp
 
-            self.den_l, self.den_v, self.h_l, self.h_v, self.latent_heat_vapourisation, self.pressure, ldynvis = self.thermophys(self.temperature)
+            properties = self.thermophys(self.temperature)
+            self.den_l = properties["rho_l"]
+            self.den_v = properties["rho_v"]
+            self.h_l = properties["h_l"]
+            self.h_v = properties["h_v"]
+            self.pressure = properties["vapour_pressure"]
+
             self.mass_l = (1 - self.dryness) * self.mass
             self.mass_v = self.dryness * self.mass
             self.enthalpy = self.mass_l * self.h_l + self.mass_v * self.h_v
@@ -172,7 +194,6 @@ class Propellant(object):
             self.den_l, self.den_v, self.h_l, self.h_v, self.latent_heat_vapourisation, self.pressure, ldynvis = self.thermophys(self.temperature)
             self.mass_l = (1 - self.dryness) * self.mass
             self.mass_v = self.dryness * self.mass
-            print(self.enthalpy - (self.mass_l * self.h_l + self.mass_v * self.h_v))
             self.enthalpy = self.mass_l * self.h_l + self.mass_v * self.h_v
 
 
@@ -187,10 +208,17 @@ class Propellant(object):
 
             for i in range(0,10):
                 new_temp, new_pressure = self.liquid_pressurant_equations_of_state_for_solving(self.mass_l + mass_out)
-                self.den_l = self.thermophys(new_temp)[0]
+                self.den_l = self.thermophys(new_temp)["rho_l"]
 
             self.temp, self.pressure = new_temp, new_pressure
-            self.den_l, den_v, self.h_l, h_v, latent_heat_vapourisation, pressure, ldynvis = self.thermophys(self.temperature)
+
+            properties = self.thermophys(self.temperature)
+            self.den_l = properties["rho_l"]
+            self.den_v = properties["rho_v"]
+            self.h_l = properties["h_l"]
+            self.h_v = properties["h_v"]
+            self.pressure = properties["vapour_pressure"]
+
             self.den_p, self.h_p = self.pressurant_thermophys(self.temperature, self.pressure)
             self.enthalpy = self.mass_l*self.h_l + self.mass_p*self.h_p
 
@@ -246,9 +274,16 @@ class Propellant(object):
         self.mass_p += mass_in
         self.pressure = target_pressure
 
-        self.den_l, den_v, self.h_l, h_v, latent_heat_vapourisation, pressure, ldynvis = self.thermophys(self.temperature)
+        properties = self.thermophys(self.temperature)
+        self.den_l = properties["rho_l"]
+        self.den_v = properties["rho_v"]
+        self.h_l = properties["h_l"]
+        self.h_v = properties["h_v"]
+        self.pressure = properties["vapour_pressure"]
+
         self.den_p, self.h_p = self.pressurant_thermophys(self.temperature, self.pressure)
         self.enthalpy = self.mass_l*self.h_l + self.mass_p*self.h_p
 
 
-
+nitrous = Propellant("nitrous-self-pressurised", 298, 0.1, 70)
+nitrous.remove_liquid(0.1)
