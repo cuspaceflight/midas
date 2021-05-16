@@ -28,6 +28,13 @@ propellants = {
         "propep_name": 'NITROUS OXIDE',
         "octopus_name": ' nitrous oxide'
     },
+    "nitrous-helium-pressurised" : {
+        "phase": Propellant_Phase.SELF_PRESSURISING,
+        "prop_name": Propellant_Name.NITROUS,
+        "pressurant": Pressurant_Name.HELIUM,
+        "propep_name": 'NITROUS OXIDE',
+        "octopus_name": ' nitrous oxide'
+    },
     "ipa-helium-pressurised": {
         "phase": Propellant_Phase.LIQUID,
         "prop_name": Propellant_Name.IPA,
@@ -59,13 +66,16 @@ def nitrous_thermophys(temp):
     """
 
     if not 183.15 <= temp <= 309.57:
-        raise ValueError('nitrous oxide temperature out of data range')
+        return None
+        #raise ValueError('nitrous oxide temperature out of data range')
 
     # Some handy definitions
     # ...I don't know what to call these properly
     T0 = temp / 309.57
     T0_RECIP = 1 / T0
     T0_INV = 1 - T0
+
+    R = 8.314 / 44.013
 
     lden = 452 * np.exp(+ 1.72328 * pow(T0_INV, 1/3)
                         - 0.83950 * pow(T0_INV, 2/3)
@@ -84,8 +94,13 @@ def nitrous_thermophys(temp):
     hg = ((-200 + 440.055 * (T0_INV ** (1 / 3)) + -459.701 * ((1- (temp / 309.57)) ** (2 / 3))
            +434.081 * T0_INV + -485.338 * (T0_INV ** (4 / 3))) * 1000)
 
-    c = ((2.49973 * (1 + 0.023454 * (T0_INV ** (-1)) + -3.80136 * T0_INV
+    cp_l = ((2.49973 * (1 + 0.023454 * (T0_INV ** (-1)) + -3.80136 * T0_INV
                    + 13.0945 * (T0_INV ** 2) + -14.5180 * (T0_INV ** 3))) * 1000)
+    
+    cp_g = (132.632 * (1 + (0.052187 * pow(T0_INV, (-2 / 3))) +
+                    (-0.364923 * pow(T0_INV, (-1 / 3))) +
+                    (-1.20233 * pow(T0_INV, ( 1 / 3))) +
+                    (0.536141 * pow(T0_INV, ( 2 / 3))))) * 1000
 
     vpres =  7251000 * (np.e **(T0_RECIP * 
         ( -6.71893 * T0_INV) + 
@@ -98,11 +113,15 @@ def nitrous_thermophys(temp):
 
 
     properties = {
-        "rho_l" : lden,
-        "rho_v" : vden,
-        "h_l" :   hl,
-        "h_v":    hg,
-        "specific_heat_capacity_isobaric":   c,
+        "rho_l" :   lden,
+        "rho_v" :   vden,
+        "h_l" :     hl,
+        "h_v" :     hg,
+        "R" :       R,
+        "cp_g" :    cp_g,
+        "cv_g" :    cp_g - R,
+        "cp_l":     cp_l,
+        "cv_l":     cp_l,
         "vapour_pressure": vpres,
         "dynamic_visc": ldynvis,
         "v_l":  (1/lden),
@@ -155,6 +174,8 @@ def ipa_thermophys(temp):
         - vapour pressure for input temperature
 
     """
+    R = 8.314 / 60.096
+
     lden = 925.87 + (-0.0359 * temp) + (-0.0015 * temp**2)
     # Fit for data obtained from http://www.ddbst.com/en/EED/PCP/DEN_C95.php
 
@@ -165,7 +186,9 @@ def ipa_thermophys(temp):
 
     hg = 0
 
-    c = 0
+    cp_l = 212    
+
+    cp_g = 0
 
     vpres = 1000 * (20693 + (-119.57 * temp) + (0.1724 * temp**2))
     # Fit for data obtained from http://www.ddbst.com/en/EED/PCP/VAP_C95.php
@@ -178,14 +201,16 @@ def ipa_thermophys(temp):
         "rho_v" : vden,
         "h_l" :   hl,
         "h_v":    hg,
-        "latent_heat_vap":   c,
+        "cp_g" :    cp_g,
+        "cv_g" :    cp_g - R,
+        "cp_l":     cp_l,
+        "cv_l":     cp_l,
         "vapour_pressure": vpres,
         "dynamic_visc": ldynvis,
         "v_l":  (1/lden),
         "v_v":  (1/vden)
     }
     return(properties)
-
 
 def helium_thermophys(temp, pressure):
     """Gets helium data at a given temperature and pressure with ideal gas assumptions
@@ -195,10 +220,16 @@ def helium_thermophys(temp, pressure):
         - gas enthalpy
     """
 
-    vden = pressure / (2080 * temp)
+    R = 2080
+
+    vden = pressure / (R * temp)
 
     hv = 5.19 * temp
 
-    return (vden, hv)
+    properties = {
+        "rho_v" :   vden,
+        "h_v" :     hv,
+        "R" :       R
+    }
 
-nitrous_thermophys_dt(290.5)
+    return(properties)

@@ -59,7 +59,7 @@ def make_panthera(temperature, of_ratio , ox_tank_volume = None, ox_mass = 110):
 def make_two_stage_rocket(temperature, ox_mass, ox_volume = None):
     panthera = make_panthera(temperature, 3.5, ox_tank_volume=None, ox_mass=ox_mass)
     panthera.load_drag_data(1)
-    panthera.engine.construct_injector(panthera.oxidiser.pressure, panthera.oxidiser.temperature, panthera.fuel.pressure, panthera.fuel.temperature)
+    #panthera.engine.construct_injector(panthera.oxidiser.pressure, panthera.oxidiser.temperature, panthera.fuel.pressure, panthera.fuel.temperature)
 
     pro98 = SolidMotor("Pro98", "white-dwarf")
     pro98.read_eng_file()
@@ -236,6 +236,12 @@ for i in range(len(t_steps)):
 
 print(heights)
 """
-griffin = make_two_stage_rocket(250,110)
-times, position_1st_stage, velocity_1st_stage, position_2nd_stage, velocity_2nd_stage, acceleration_1st_stage, acceleration_2nd_stage = main_flight_loop(griffin, 1)
+griffin = make_two_stage_rocket(260,110)
+
+print(griffin["booster"].oxidiser.pressure/1e5)
+print(griffin["booster"].mass)
+print(griffin["booster"].oxidiser.mass)
+print(griffin["booster"].fuel.mass)
+
+#times, position_1st_stage, velocity_1st_stage, position_2nd_stage, velocity_2nd_stage, acceleration_1st_stage, acceleration_2nd_stage = main_flight_loop(griffin, 1)
         

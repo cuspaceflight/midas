@@ -97,7 +97,7 @@ class LiquidEngine(object):
         ox_orifice = Orifice(ox_manifold, 1e-2, 2e-3, orifice_type=0)
         fuel_orifice = Orifice(fuel_manifold, 1e-2, 1e-3, orifice_type=0)
 
-        
+        print(self.chamber_pressure)
         fuel_mass_flow = fuel_orifice.m_dot_SPI(self.chamber_pressure) * self.n_fuel_orifices
         dyer_flow_rate = ox_orifice.m_dot_dyer(self.chamber_pressure)
         if dyer_flow_rate!=None:

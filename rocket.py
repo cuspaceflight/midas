@@ -76,12 +76,6 @@ class Rocket(object):
             
             self.fuel.remove_liquid(fuel_mass_flow * dt)
             self.oxidiser.remove_liquid(ox_mass_flow * dt)
-
-            if self.fuel.pressurant != None: 
-                self.fuel.top_up_pressurant(self.fuel.temperature, self.fuel.target_pressure)
-
-            if self.oxidiser.pressurant != None: 
-                self.fuel.top_up_pressurant(self.oxidiser.temperature, self.oxidiser.target_pressure)
         
         elif type(self.engine) == SolidMotor:
             thrust = self.engine.get_thrust(time)
